@@ -1,5 +1,8 @@
 import React from "react";
 import styled from "styled-components";
+import { connect } from "react-redux";
+import { selectBoard } from "./selectors";
+import { createNewBoard } from "./actions";
 
 const theme = {
   cellSize: 25
@@ -18,143 +21,7 @@ const Cell = styled.div`
 const Row = styled.div`
   display: flex;
   flex-wrap: wrap;
-  display: inline-block;
 `;
-
-const boardState = [
-  [
-    {
-      value: 0,
-      covered: true
-    },
-    {
-      value: 1,
-      covered: true
-    },
-    {
-      value: 0,
-      covered: true
-    },
-    {
-      value: 1,
-      covered: true
-    },
-    {
-      value: 0,
-      covered: true
-    }
-  ],
-  [
-    {
-      value: 0,
-      covered: true
-    },
-    {
-      value: 1,
-      covered: true
-    },
-    {
-      value: 0,
-      covered: true
-    },
-    {
-      value: 1,
-      covered: true
-    },
-    {
-      value: 0,
-      covered: true
-    }
-  ],
-  [
-    {
-      value: 0,
-      covered: true
-    },
-    {
-      value: 1,
-      covered: true
-    },
-    {
-      value: 0,
-      covered: true
-    },
-    {
-      value: 1,
-      covered: true
-    },
-    {
-      value: 0,
-      covered: true
-    }
-  ],
-  [
-    {
-      value: 0,
-      covered: true
-    },
-    {
-      value: 1,
-      covered: true
-    },
-    {
-      value: 0,
-      covered: true
-    },
-    {
-      value: 1,
-      covered: true
-    },
-    {
-      value: 0,
-      covered: true
-    }
-  ],
-  [
-    {
-      value: 0,
-      covered: true
-    },
-    {
-      value: 1,
-      covered: true
-    },
-    {
-      value: 0,
-      covered: true
-    },
-    {
-      value: 1,
-      covered: true
-    },
-    {
-      value: 0,
-      covered: true
-    }
-  ],
-  [
-    {
-      value: 0,
-      covered: true
-    },
-    {
-      value: 1,
-      covered: true
-    },
-    {
-      value: 0,
-      covered: true
-    },
-    {
-      value: 1,
-      covered: true
-    },
-    {
-      value: 0,
-      covered: true
-    }
-  ]
-];
 
 const Container = styled.div`
   max-width: 960px;
@@ -162,9 +29,12 @@ const Container = styled.div`
   text-align: center;
 `;
 
-const BoardScreen = () => (
+const BoardScreen = ({ board, createNewBoard }) => (
   <Container>
-    {boardState.map(row => (
+    <button onClick={() => createNewBoard({ width: 3, height: 3, mines: 2 })}>
+      New
+    </button>
+    {board.map(row => (
       <Row>
         {row.map(cell => (
           <Cell>{cell.value}</Cell>
@@ -174,4 +44,15 @@ const BoardScreen = () => (
   </Container>
 );
 
-export default BoardScreen;
+const mapStateToProps = state => ({
+  board: selectBoard(state)
+});
+
+const mapDispatchToProps = {
+  createNewBoard
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(BoardScreen);

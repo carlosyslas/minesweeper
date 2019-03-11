@@ -1,0 +1,88 @@
+import { fromJS, List } from "immutable";
+import reducer from "./reducer";
+import { uncoverCell, createNewBoard } from "./actions";
+
+describe("Board reducer", () => {
+  it("returns the initial state by default", () => {
+    const state = reducer(undefined);
+
+    expect(state).toEqual(new List());
+  });
+
+  it("sets a cover state to false when uncover action was dispatched", () => {
+    const initialState = fromJS([
+      [
+        { value: 1, covered: true },
+        { value: 1, covered: true },
+        { value: 1, covered: true }
+      ],
+      [
+        { value: 1, covered: true },
+        { value: 1, covered: true },
+        { value: 1, covered: true }
+      ],
+      [
+        { value: 1, covered: true },
+        { value: 1, covered: true },
+        { value: 1, covered: true }
+      ]
+    ]);
+    const expectedState = fromJS([
+      [
+        { value: 1, covered: true },
+        { value: 1, covered: true },
+        { value: 1, covered: true }
+      ],
+      [
+        { value: 1, covered: true },
+        { value: 1, covered: false },
+        { value: 1, covered: true }
+      ],
+      [
+        { value: 1, covered: true },
+        { value: 1, covered: true },
+        { value: 1, covered: true }
+      ]
+    ]);
+
+    const state = reducer(initialState, uncoverCell({ row: 1, col: 1 }));
+
+    expect(state).toEqual(expectedState);
+  });
+
+  it("does not produce a new state if uncoverCell was triggered with wrong arguments", () => {
+    const initialState = fromJS([
+      [
+        {
+          value: 1,
+          covered: true
+        }
+      ]
+    ]);
+
+    const state = reducer(initialState, uncoverCell({ row: 1, col: 1 }));
+
+    expect(state).toEqual(initialState);
+  });
+
+  it("creates a new board with the given size and number of mines", () => {
+    const state = reducer(
+      undefined,
+      createNewBoard({ width: 10, height: 10, mines: 10 })
+    );
+
+    expect(state.size).toEqual(10);
+    expect(state.get(0).size).toEqual(10);
+    expect(state.flatten().count(cell => cell.value === -1)).toEqual(10);
+  });
+
+  it("adds the counts of adjacent cells with mines", () => {
+    const state = reducer(
+      undefined,
+      createNewBoard({ width: 2, height: 2, mines: 2 })
+    );
+    const sum = state.flatten().reduce((sum, cell) => sum + cell.value, 0);
+
+    expect(sum).toEqual(2);
+  });
+});
