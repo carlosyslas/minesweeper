@@ -81,9 +81,7 @@ const BoardScreen = ({
   unflagCell
 }) => (
   <Container>
-    <button
-      onClick={() => createNewBoard({ width: 10, height: 10, mines: 10 })}
-    >
+    <button onClick={() => createNewBoard({ width: 9, height: 9, mines: 10 })}>
       New
     </button>
     {board.map((row, r) => (

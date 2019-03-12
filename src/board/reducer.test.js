@@ -141,7 +141,46 @@ describe("Board reducer", () => {
       expect(state).toEqual(expectedState);
     });
 
-    // TODO: test recursive uncover
+    it("uncovers all the cells that don't have an adjacent mine", () => {
+      const initialState = fromJS([
+        [
+          { value: 0, covered: true, flagged: false },
+          { value: 1, covered: true, flagged: false },
+          { value: -1, covered: true, flagged: false }
+        ],
+        [
+          { value: 0, covered: true, flagged: false },
+          { value: 1, covered: true, flagged: false },
+          { value: 1, covered: true, flagged: false }
+        ],
+        [
+          { value: 0, covered: true, flagged: false },
+          { value: 0, covered: true, flagged: false },
+          { value: 0, covered: true, flagged: false }
+        ]
+      ]);
+      const expectedState = fromJS([
+        [
+          { value: 0, covered: false, flagged: false },
+          { value: 1, covered: false, flagged: false },
+          { value: -1, covered: true, flagged: false }
+        ],
+        [
+          { value: 0, covered: false, flagged: false },
+          { value: 1, covered: false, flagged: false },
+          { value: 1, covered: false, flagged: false }
+        ],
+        [
+          { value: 0, covered: false, flagged: false },
+          { value: 0, covered: false, flagged: false },
+          { value: 0, covered: false, flagged: false }
+        ]
+      ]);
+
+      const state = reducer(initialState, uncoverCell({ row: 0, col: 0 }));
+
+      expect(state).toEqual(expectedState);
+    });
   });
 
   it("creates a new board with the given size and number of mines", () => {

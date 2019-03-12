@@ -20,8 +20,14 @@ const reduceUncoverCell = (state, { row, col }) => {
   if (!isInBoardBoundaries(state, { row, col })) {
     return state;
   }
+  const value = state.getIn([row, col, "value"]);
+  const covered = state.getIn([row, col, "covered"]);
 
-  if (state.getIn([row, col, "value"]) === HAS_MINE) {
+  if (!covered) {
+    return state;
+  }
+
+  if (value === HAS_MINE) {
     state = state.map(row =>
       row.map(cell => {
         if (cell.get("value") === HAS_MINE) {
@@ -33,9 +39,22 @@ const reduceUncoverCell = (state, { row, col }) => {
     );
   }
 
-  return state
+  state = state
     .setIn([row, col, "covered"], false)
     .setIn([row, col, "flagged"], false);
+
+  if (value === 0 && covered) {
+    state = reduceUncoverCell(state, { row: row - 1, col: col - 1 });
+    state = reduceUncoverCell(state, { row: row - 1, col: col });
+    state = reduceUncoverCell(state, { row: row - 1, col: col + 1 });
+    state = reduceUncoverCell(state, { row: row, col: col - 1 });
+    state = reduceUncoverCell(state, { row: row, col: col + 1 });
+    state = reduceUncoverCell(state, { row: row + 1, col: col - 1 });
+    state = reduceUncoverCell(state, { row: row + 1, col: col });
+    state = reduceUncoverCell(state, { row: row + 1, col: col + 1 });
+  }
+
+  return state;
 };
 
 const getMineValue = (board, row, col) => {
