@@ -15,12 +15,27 @@ const HAS_MINE = -1;
 const isInBoardBoundaries = (board, { row, col }) =>
   row >= 0 && col >= 0 && row < board.size && col < board.get(0).size;
 
+// TODO: use redux saga to reduce code complexity?
 const reduceUncoverCell = (state, { row, col }) => {
   if (!isInBoardBoundaries(state, { row, col })) {
     return state;
   }
 
-  return state.setIn([row, col, "covered"], false);
+  if (state.getIn([row, col, "value"]) === HAS_MINE) {
+    state = state.map(row =>
+      row.map(cell => {
+        if (cell.get("value") === HAS_MINE) {
+          return cell.set("covered", false);
+        }
+
+        return cell;
+      })
+    );
+  }
+
+  return state
+    .setIn([row, col, "covered"], false)
+    .setIn([row, col, "flagged"], false);
 };
 
 const getMineValue = (board, row, col) => {

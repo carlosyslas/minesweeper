@@ -13,36 +13,36 @@ describe("Board reducer", () => {
     it("sets a cover state to false when uncover action was dispatched", () => {
       const initialState = fromJS([
         [
-          { value: 1, covered: true },
-          { value: 1, covered: true },
-          { value: 1, covered: true }
+          { value: 1, covered: true, flagged: false },
+          { value: 1, covered: true, flagged: false },
+          { value: 1, covered: true, flagged: false }
         ],
         [
-          { value: 1, covered: true },
-          { value: 1, covered: true },
-          { value: 1, covered: true }
+          { value: 1, covered: true, flagged: false },
+          { value: 1, covered: true, flagged: false },
+          { value: 1, covered: true, flagged: false }
         ],
         [
-          { value: 1, covered: true },
-          { value: 1, covered: true },
-          { value: 1, covered: true }
+          { value: 1, covered: true, flagged: false },
+          { value: 1, covered: true, flagged: false },
+          { value: 1, covered: true, flagged: false }
         ]
       ]);
       const expectedState = fromJS([
         [
-          { value: 1, covered: true },
-          { value: 1, covered: true },
-          { value: 1, covered: true }
+          { value: 1, covered: true, flagged: false },
+          { value: 1, covered: true, flagged: false },
+          { value: 1, covered: true, flagged: false }
         ],
         [
-          { value: 1, covered: true },
-          { value: 1, covered: false },
-          { value: 1, covered: true }
+          { value: 1, covered: true, flagged: false },
+          { value: 1, covered: false, flagged: false },
+          { value: 1, covered: true, flagged: false }
         ],
         [
-          { value: 1, covered: true },
-          { value: 1, covered: true },
-          { value: 1, covered: true }
+          { value: 1, covered: true, flagged: false },
+          { value: 1, covered: true, flagged: false },
+          { value: 1, covered: true, flagged: false }
         ]
       ]);
 
@@ -66,11 +66,82 @@ describe("Board reducer", () => {
       expect(state).toEqual(initialState);
     });
 
+    it("removes the flag from the to be uncovered cell", () => {
+      const initialState = fromJS([
+        [
+          {
+            value: 1,
+            covered: true,
+            flagged: true
+          }
+        ]
+      ]);
+
+      const state = reducer(initialState, uncoverCell({ row: 0, col: 0 }));
+
+      expect(state.getIn([0, 0, "flagged"])).toBe(false);
+    });
+
+    it("uncovers all the mines on an explosion", () => {
+      const initialState = fromJS([
+        [
+          {
+            value: -1,
+            covered: true,
+            flagged: false
+          },
+          {
+            value: 2,
+            covered: true,
+            flagged: false
+          }
+        ],
+        [
+          {
+            value: 2,
+            covered: true,
+            flagged: false
+          },
+          {
+            value: -1,
+            covered: true,
+            flagged: false
+          }
+        ]
+      ]);
+      const expectedState = fromJS([
+        [
+          {
+            value: -1,
+            covered: false,
+            flagged: false
+          },
+          {
+            value: 2,
+            covered: true,
+            flagged: false
+          }
+        ],
+        [
+          {
+            value: 2,
+            covered: true,
+            flagged: false
+          },
+          {
+            value: -1,
+            covered: false,
+            flagged: false
+          }
+        ]
+      ]);
+
+      const state = reducer(initialState, uncoverCell({ row: 0, col: 0 }));
+
+      expect(state).toEqual(expectedState);
+    });
+
     // TODO: test recursive uncover
-
-    // TODO: test uncover removes flag
-
-    // TODO: test uncover all mines on explosion
   });
 
   it("creates a new board with the given size and number of mines", () => {
