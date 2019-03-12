@@ -1,7 +1,7 @@
-import React from "react";
+import React, { Component } from "react";
 import styled from "styled-components";
 import { connect } from "react-redux";
-import { selectBoard } from "./selectors";
+import { selectBoard, selectCoveredCellsCount } from "./selectors";
 import { createNewBoard, uncoverCell, flagCell, unflagCell } from "./actions";
 import { selectGameStatus } from "../status/selectors";
 import { HAS_MINE } from "./reducer";
@@ -96,68 +96,89 @@ const CellContent = ({ value, covered, flagged }) => {
   return <MinesCount value={value}>{value}</MinesCount>;
 };
 
-const BoardScreen = ({
-  board,
-  gameStatus,
-  createNewBoard,
-  uncoverCell,
-  flagCell,
-  unflagCell,
-  setGameStatus
-}) => (
-  <Container>
-    <button
-      onClick={() => {
-        setGameStatus(GAME_STATUS.RUNNING);
-        createNewBoard({ width: 9, height: 9, mines: 10 });
-      }}
-    >
-      New
-    </button>
-    {board.map((row, r) => (
-      <Row>
-        {row.map((cell, col) => (
-          <Cell
-            covered={cell.covered}
-            onClick={() => {
-              if (gameStatus !== GAME_STATUS.RUNNING) {
-                return;
-              }
+class BoardScreen extends Component {
+  componentDidUpdate() {
+    const { setGameStatus, coveredCellsCount } = this.props;
 
-              uncoverCell({ row: r, col });
-              if (board.getIn([r, col, "value"]) === HAS_MINE) {
-                setGameStatus(GAME_STATUS.LOST);
-              }
-            }}
-            onContextMenu={e => {
-              e.preventDefault();
+    if (coveredCellsCount === 0) {
+      setGameStatus(GAME_STATUS.WON);
+    }
+  }
 
-              if (gameStatus !== GAME_STATUS.RUNNING) {
-                return;
-              }
+  handleCellClick = ({ row, col }) => {
+    const { board, gameStatus, setGameStatus, uncoverCell } = this.props;
 
-              if (cell.flagged) {
-                unflagCell({ row: r, col });
-              } else {
-                flagCell({ row: r, col });
-              }
-            }}
-          >
-            <CellContent
-              value={cell.value}
-              covered={cell.covered}
-              flagged={cell.flagged}
-            />
-          </Cell>
+    if (gameStatus !== GAME_STATUS.RUNNING) {
+      return;
+    }
+
+    uncoverCell({ row, col });
+    if (board.getIn([row, col, "value"]) === HAS_MINE) {
+      setGameStatus(GAME_STATUS.LOST);
+    }
+  };
+
+  handleCellRightClick = (e, { row, col }) => {
+    const { board, gameStatus, unflagCell, flagCell } = this.props;
+    e.preventDefault();
+
+    if (gameStatus !== GAME_STATUS.RUNNING) {
+      return;
+    }
+
+    if (board.getIn([row, col, "flagged"])) {
+      unflagCell({ row, col });
+    } else {
+      flagCell({ row, col });
+    }
+  };
+
+  render() {
+    const {
+      board,
+      createNewBoard,
+      setGameStatus,
+      coveredCellsCount
+    } = this.props;
+
+    return (
+      <Container>
+        COUNT:{coveredCellsCount}
+        <button
+          onClick={() => {
+            setGameStatus(GAME_STATUS.RUNNING);
+            createNewBoard({ width: 9, height: 9, mines: 1 });
+          }}
+        >
+          New
+        </button>
+        {board.map((row, r) => (
+          <Row>
+            {row.map((cell, col) => (
+              <Cell
+                covered={cell.covered}
+                onClick={() => this.handleCellClick({ row: r, col })}
+                onContextMenu={e =>
+                  this.handleCellRightClick(e, { row: r, col })
+                }
+              >
+                <CellContent
+                  value={cell.value}
+                  covered={cell.covered}
+                  flagged={cell.flagged}
+                />
+              </Cell>
+            ))}
+          </Row>
         ))}
-      </Row>
-    ))}
-  </Container>
-);
-
+      </Container>
+    );
+  }
+}
 const mapStateToProps = state => ({
   board: selectBoard(state),
-  gameStatus: selectGameStatus(state)
+  gameStatus: selectGameStatus(state),
+  coveredCellsCount: selectCoveredCellsCount(state)
 });
 
 const mapDispatchToProps = {
