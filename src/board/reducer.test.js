@@ -67,6 +67,10 @@ describe("Board reducer", () => {
     });
 
     // TODO: test recursive uncover
+
+    // TODO: test uncover removes flag
+
+    // TODO: test uncover all mines on explosion
   });
 
   it("creates a new board with the given size and number of mines", () => {

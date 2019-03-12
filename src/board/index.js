@@ -16,11 +16,14 @@ const Cell = styled.div`
   text-align: center;
   font-size: ${theme.cellSize * 0.6}px;
   line-height: ${theme.cellSize}px;
+  transition: background 0.3s;
+  box-shadow: 0px 0px 5px 3px rgba(0, 0, 0, 0.1) inset;
 `;
 
 const Row = styled.div`
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
 `;
 
 const Container = styled.div`
@@ -33,15 +36,26 @@ const Mine = styled.div`
   width: ${theme.cellSize / 2}px;
   height: ${theme.cellSize / 2}px;
   border-radius: 50%;
-  background: #f90;
+  background: #ff7500;
   margin: 0 auto;
   display: inline-block;
   vertical-align: middle;
+  box-shadow: 0px 0px 5px 1px #ff3f00, 0px 0px 3px 0px #fffc00 inset;
 `;
+
+const FlagContainer = styled.div`
+  font-size: 12px;
+  color: red;
+`;
+const Flag = () => (
+  <FlagContainer>
+    <i className="fas fa-flag" />
+  </FlagContainer>
+);
 
 const CellContent = ({ value, covered, flagged }) => {
   if (flagged) {
-    return <div>🚩</div>;
+    return <Flag />;
   }
 
   if (value === 0) {
@@ -67,7 +81,9 @@ const BoardScreen = ({
   unflagCell
 }) => (
   <Container>
-    <button onClick={() => createNewBoard({ width: 3, height: 3, mines: 2 })}>
+    <button
+      onClick={() => createNewBoard({ width: 10, height: 10, mines: 10 })}
+    >
       New
     </button>
     {board.map((row, r) => (
