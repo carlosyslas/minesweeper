@@ -3,7 +3,7 @@ import { Provider } from "react-redux";
 import { createStore } from "redux";
 import { Switch, Route } from "react-router";
 import { BrowserRouter } from "react-router-dom";
-import Board from "./game/board";
+import Game from "./game/Game";
 import Home from "./home";
 import rootReducer from "./rootReducer";
 
@@ -15,9 +15,8 @@ class App extends Component {
       <Provider store={store}>
         <BrowserRouter>
           <Switch>
-            <Route path="/game" component={Board} />
+            <Route path="/game" component={Game} />
             <Route exact path="/menu" component={Home} />
-            <Board />
           </Switch>
         </BrowserRouter>
       </Provider>

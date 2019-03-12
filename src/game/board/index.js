@@ -7,26 +7,14 @@ import { selectGameStatus } from "../status/selectors";
 import { HAS_MINE } from "./reducer";
 import { setGameStatus } from "../status/actions";
 import { GAME_STATUS } from "../status/constants";
-
-const theme = {
-  cellSize: 30,
-  minesCountColors: [
-    "#00C9A7",
-    "#008F7A",
-    "#0089BA",
-    "#2C73D2",
-    "#845EC2",
-    "#D65DB1",
-    "#FF6F91",
-    "#FF9671"
-  ]
-};
+import theme from "../../theme";
 
 const Cell = styled.div`
   width: ${theme.cellSize}px;
   height: ${theme.cellSize}px;
-  background: ${props => (props.covered ? "#6cb7ff" : "#fff")};
-  border: 2px solid #333;
+  background: ${props =>
+    props.covered ? theme.primaryColor : theme.whiteColor};
+  border: 2px solid ${theme.bodyBackground};
   border-radius: 4px;
   text-align: center;
   font-size: ${theme.cellSize * 0.6}px;
@@ -43,12 +31,6 @@ const Row = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-`;
-
-const Container = styled.div`
-  max-width: 960px;
-  margin: 30px auto;
-  text-align: center;
 `;
 
 const Mine = styled.div`
@@ -142,7 +124,7 @@ class BoardScreen extends Component {
     } = this.props;
 
     return (
-      <Container>
+      <div>
         COUNT:{coveredCellsCount}
         <button
           onClick={() => {
@@ -171,7 +153,7 @@ class BoardScreen extends Component {
             ))}
           </Row>
         ))}
-      </Container>
+      </div>
     );
   }
 }
