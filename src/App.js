@@ -3,10 +3,9 @@ import { Provider } from "react-redux";
 import { createStore } from "redux";
 import { Switch, Route } from "react-router";
 import { BrowserRouter } from "react-router-dom";
-import Board from "./board";
+import Board from "./game/board";
 import Home from "./home";
 import rootReducer from "./rootReducer";
-import "./App.css";
 
 const store = createStore(rootReducer);
 

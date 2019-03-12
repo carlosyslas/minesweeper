@@ -3,21 +3,40 @@ import styled from "styled-components";
 import { connect } from "react-redux";
 import { selectBoard } from "./selectors";
 import { createNewBoard, uncoverCell, flagCell, unflagCell } from "./actions";
+import { selectGameStatus } from "../status/selectors";
+import { HAS_MINE } from "./reducer";
+import { setGameStatus } from "../status/actions";
+import { GAME_STATUS } from "../status/constants";
 
 const theme = {
-  cellSize: 25
+  cellSize: 30,
+  minesCountColors: [
+    "#00C9A7",
+    "#008F7A",
+    "#0089BA",
+    "#2C73D2",
+    "#845EC2",
+    "#D65DB1",
+    "#FF6F91",
+    "#FF9671"
+  ]
 };
 
 const Cell = styled.div`
   width: ${theme.cellSize}px;
   height: ${theme.cellSize}px;
   background: ${props => (props.covered ? "#6cb7ff" : "#fff")};
-  border: 1px solid;
+  border: 2px solid #333;
+  border-radius: 4px;
   text-align: center;
   font-size: ${theme.cellSize * 0.6}px;
   line-height: ${theme.cellSize}px;
-  transition: background 0.3s;
-  box-shadow: 0px 0px 5px 3px rgba(0, 0, 0, 0.1) inset;
+  transition: 0.3s;
+  box-shadow: 0px 0px 5px 3px rgba(0, 0, 0, 0.15) inset;
+  cursor: pointer;
+  :hover {
+    filter: brightness(1.2);
+  }
 `;
 
 const Row = styled.div`
@@ -28,7 +47,7 @@ const Row = styled.div`
 
 const Container = styled.div`
   max-width: 960px;
-  margin: 0 auto;
+  margin: 30px auto;
   text-align: center;
 `;
 
@@ -53,6 +72,10 @@ const Flag = () => (
   </FlagContainer>
 );
 
+const MinesCount = styled.span`
+  color: ${props => theme.minesCountColors[props.value - 1]};
+`;
+
 const CellContent = ({ value, covered, flagged }) => {
   if (flagged) {
     return <Flag />;
@@ -70,18 +93,25 @@ const CellContent = ({ value, covered, flagged }) => {
     return <Mine />;
   }
 
-  return <div>{value}</div>;
+  return <MinesCount value={value}>{value}</MinesCount>;
 };
 
 const BoardScreen = ({
   board,
+  gameStatus,
   createNewBoard,
   uncoverCell,
   flagCell,
-  unflagCell
+  unflagCell,
+  setGameStatus
 }) => (
   <Container>
-    <button onClick={() => createNewBoard({ width: 9, height: 9, mines: 10 })}>
+    <button
+      onClick={() => {
+        setGameStatus(GAME_STATUS.RUNNING);
+        createNewBoard({ width: 9, height: 9, mines: 10 });
+      }}
+    >
       New
     </button>
     {board.map((row, r) => (
@@ -89,9 +119,22 @@ const BoardScreen = ({
         {row.map((cell, col) => (
           <Cell
             covered={cell.covered}
-            onClick={() => uncoverCell({ row: r, col })}
+            onClick={() => {
+              if (gameStatus !== GAME_STATUS.RUNNING) {
+                return;
+              }
+
+              uncoverCell({ row: r, col });
+              if (board.getIn([r, col, "value"]) === HAS_MINE) {
+                setGameStatus(GAME_STATUS.LOST);
+              }
+            }}
             onContextMenu={e => {
               e.preventDefault();
+
+              if (gameStatus !== GAME_STATUS.RUNNING) {
+                return;
+              }
 
               if (cell.flagged) {
                 unflagCell({ row: r, col });
@@ -113,14 +156,16 @@ const BoardScreen = ({
 );
 
 const mapStateToProps = state => ({
-  board: selectBoard(state)
+  board: selectBoard(state),
+  gameStatus: selectGameStatus(state)
 });
 
 const mapDispatchToProps = {
   createNewBoard,
   uncoverCell,
   flagCell,
-  unflagCell
+  unflagCell,
+  setGameStatus
 };
 
 export default connect(

@@ -9,7 +9,7 @@ import { CellRecord } from "./records";
 
 const initialState = new List();
 
-const HAS_MINE = -1;
+export const HAS_MINE = -1;
 
 const isInBoardBoundaries = (board, { row, col }) =>
   row >= 0 && col >= 0 && row < board.size && col < board.get(0).size;

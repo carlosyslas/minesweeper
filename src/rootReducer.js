@@ -1,8 +1,8 @@
 import { combineReducers } from "redux-immutable";
-import board from "./board/reducer";
+import game from "./game/reducer";
 
 const rootReducer = combineReducers({
-  board
+  game
 });
 
 export default rootReducer;
