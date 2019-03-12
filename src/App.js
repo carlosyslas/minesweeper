@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Provider } from "react-redux";
 import { createStore } from "redux";
-import { Switch, Route } from "react-router";
+import { Switch, Route, Redirect } from "react-router";
 import { BrowserRouter } from "react-router-dom";
 import Game from "./game/Game";
 import Home from "./home";
@@ -13,10 +13,10 @@ class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        <BrowserRouter>
+        <BrowserRouter basename={process.env.PUBLIC_URL}>
           <Switch>
+            <Route exact path="/" component={Home} />
             <Route path="/game" component={Game} />
-            <Route exact path="/menu" component={Home} />
           </Switch>
         </BrowserRouter>
       </Provider>
