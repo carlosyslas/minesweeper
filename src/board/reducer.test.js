@@ -204,6 +204,8 @@ describe("Board reducer", () => {
     expect(sum).toEqual(2);
   });
 
+  // TODO: test that there should always be at least one mine free cell.
+
   describe("flag", () => {
     it("sets the flagged state of a cell to true", () => {
       const initialState = fromJS([

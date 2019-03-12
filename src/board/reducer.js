@@ -6,7 +6,6 @@ import {
   UNFLAG_CELL
 } from "./actions";
 import { CellRecord } from "./records";
-import { selectIsCellCovered } from "./selectors";
 
 const initialState = new List();
 
@@ -32,6 +31,7 @@ const reduceUncoverCell = (state, { row, col }) => {
       row.map(cell => {
         if (cell.get("value") === HAS_MINE) {
           return cell.set("covered", false);
+          // TODO: unflag this cell as well.
         }
 
         return cell;
