@@ -1,3 +1,3 @@
 import { Record } from "immutable";
 
-export const CellRecord = Record({ value: 0, covered: true });
+export const CellRecord = Record({ value: 0, covered: true, flagged: false });

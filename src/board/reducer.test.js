@@ -1,6 +1,6 @@
 import { fromJS, List } from "immutable";
 import reducer from "./reducer";
-import { uncoverCell, createNewBoard } from "./actions";
+import { uncoverCell, createNewBoard, flagCell, unflagCell } from "./actions";
 
 describe("Board reducer", () => {
   it("returns the initial state by default", () => {
@@ -9,60 +9,64 @@ describe("Board reducer", () => {
     expect(state).toEqual(new List());
   });
 
-  it("sets a cover state to false when uncover action was dispatched", () => {
-    const initialState = fromJS([
-      [
-        { value: 1, covered: true },
-        { value: 1, covered: true },
-        { value: 1, covered: true }
-      ],
-      [
-        { value: 1, covered: true },
-        { value: 1, covered: true },
-        { value: 1, covered: true }
-      ],
-      [
-        { value: 1, covered: true },
-        { value: 1, covered: true },
-        { value: 1, covered: true }
-      ]
-    ]);
-    const expectedState = fromJS([
-      [
-        { value: 1, covered: true },
-        { value: 1, covered: true },
-        { value: 1, covered: true }
-      ],
-      [
-        { value: 1, covered: true },
-        { value: 1, covered: false },
-        { value: 1, covered: true }
-      ],
-      [
-        { value: 1, covered: true },
-        { value: 1, covered: true },
-        { value: 1, covered: true }
-      ]
-    ]);
+  describe("uncover", () => {
+    it("sets a cover state to false when uncover action was dispatched", () => {
+      const initialState = fromJS([
+        [
+          { value: 1, covered: true },
+          { value: 1, covered: true },
+          { value: 1, covered: true }
+        ],
+        [
+          { value: 1, covered: true },
+          { value: 1, covered: true },
+          { value: 1, covered: true }
+        ],
+        [
+          { value: 1, covered: true },
+          { value: 1, covered: true },
+          { value: 1, covered: true }
+        ]
+      ]);
+      const expectedState = fromJS([
+        [
+          { value: 1, covered: true },
+          { value: 1, covered: true },
+          { value: 1, covered: true }
+        ],
+        [
+          { value: 1, covered: true },
+          { value: 1, covered: false },
+          { value: 1, covered: true }
+        ],
+        [
+          { value: 1, covered: true },
+          { value: 1, covered: true },
+          { value: 1, covered: true }
+        ]
+      ]);
 
-    const state = reducer(initialState, uncoverCell({ row: 1, col: 1 }));
+      const state = reducer(initialState, uncoverCell({ row: 1, col: 1 }));
 
-    expect(state).toEqual(expectedState);
-  });
+      expect(state).toEqual(expectedState);
+    });
 
-  it("does not produce a new state if uncoverCell was triggered with wrong arguments", () => {
-    const initialState = fromJS([
-      [
-        {
-          value: 1,
-          covered: true
-        }
-      ]
-    ]);
+    it("does not produce a new state if uncoverCell was triggered with wrong arguments", () => {
+      const initialState = fromJS([
+        [
+          {
+            value: 1,
+            covered: true
+          }
+        ]
+      ]);
 
-    const state = reducer(initialState, uncoverCell({ row: 1, col: 1 }));
+      const state = reducer(initialState, uncoverCell({ row: -1, col: -1 }));
 
-    expect(state).toEqual(initialState);
+      expect(state).toEqual(initialState);
+    });
+
+    // TODO: test recursive uncover
   });
 
   it("creates a new board with the given size and number of mines", () => {
@@ -84,5 +88,69 @@ describe("Board reducer", () => {
     const sum = state.flatten().reduce((sum, cell) => sum + cell.value, 0);
 
     expect(sum).toEqual(2);
+  });
+
+  describe("flag", () => {
+    it("sets the flagged state of a cell to true", () => {
+      const initialState = fromJS([
+        [{ value: 1, covered: true, flagged: false }]
+      ]);
+
+      const state = reducer(initialState, flagCell({ row: 0, col: 0 }));
+
+      expect(state.getIn([0, 0, "flagged"])).toBe(true);
+    });
+
+    it("does not change the state if the provided cell position is out of the board's boundaries", () => {
+      const initialState = fromJS([
+        [{ value: 1, covered: true, flagged: false }]
+      ]);
+
+      const state = reducer(initialState, flagCell({ row: 1, col: 0 }));
+
+      expect(state).toEqual(initialState);
+    });
+
+    it("can not flag an uncovered cell", () => {
+      const initialState = fromJS([
+        [{ value: 1, covered: false, flagged: false }]
+      ]);
+
+      const state = reducer(initialState, flagCell({ row: 0, col: 0 }));
+
+      expect(state).toEqual(initialState);
+    });
+  });
+
+  describe("unflag", () => {
+    it("sets the flagged state of a cell to false", () => {
+      const initialState = fromJS([
+        [{ value: 1, covered: true, flagged: true }]
+      ]);
+
+      const state = reducer(initialState, unflagCell({ row: 0, col: 0 }));
+
+      expect(state.getIn([0, 0, "flagged"])).toBe(false);
+    });
+
+    it("does not change the state if the provided cell position is out ouf the board's boundaries", () => {
+      const initialState = fromJS([
+        [{ value: 1, covered: true, flagged: true }]
+      ]);
+
+      const state = reducer(initialState, unflagCell({ row: 0, col: -1 }));
+
+      expect(state).toEqual(initialState);
+    });
+
+    it("can not unflag an uncovered cell", () => {
+      const initialState = fromJS([
+        [{ value: 1, covered: false, flagged: true }]
+      ]);
+
+      const state = reducer(initialState, unflagCell({ row: 0, col: 0 }));
+
+      expect(state).toBe(initialState);
+    });
   });
 });

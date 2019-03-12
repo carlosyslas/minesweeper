@@ -1,17 +1,26 @@
 import { List } from "immutable";
-import { UNCOVER_CELL, CREATE_NEW_BOARD } from "./actions";
+import {
+  UNCOVER_CELL,
+  CREATE_NEW_BOARD,
+  FLAG_CELL,
+  UNFLAG_CELL
+} from "./actions";
 import { CellRecord } from "./records";
+import { selectIsCellCovered } from "./selectors";
 
 const initialState = new List();
 
 const HAS_MINE = -1;
 
+const isInBoardBoundaries = (board, { row, col }) =>
+  row >= 0 && col >= 0 && row < board.size && col < board.get(0).size;
+
 const reduceUncoverCell = (state, { row, col }) => {
-  if (row < state.size && col < state.get(row).size) {
-    return state.setIn([row, col, "covered"], false);
+  if (!isInBoardBoundaries(state, { row, col })) {
+    return state;
   }
 
-  return state;
+  return state.setIn([row, col, "covered"], false);
 };
 
 const getMineValue = (board, row, col) => {
@@ -79,12 +88,41 @@ const reduceCreateNewBoard = ({ width, height, mines }) => {
   return board;
 };
 
+const isCellCovered = (state, { row, col }) =>
+  state.getIn([row, col, "covered"]);
+
+const reduceFlagCell = (state, { row, col }) => {
+  if (
+    !isInBoardBoundaries(state, { row, col }) ||
+    !isCellCovered(state, { row, col })
+  ) {
+    return state;
+  }
+
+  return state.setIn([row, col, "flagged"], true);
+};
+
+const reduceUnflagCell = (state, { row, col }) => {
+  if (
+    !isInBoardBoundaries(state, { row, col }) ||
+    !isCellCovered(state, { row, col })
+  ) {
+    return state;
+  }
+
+  return state.setIn([row, col, "flagged"], false);
+};
+
 const reducer = (state = initialState, { type, payload } = {}) => {
   switch (type) {
     case UNCOVER_CELL:
       return reduceUncoverCell(state, payload);
     case CREATE_NEW_BOARD:
       return reduceCreateNewBoard(payload);
+    case FLAG_CELL:
+      return reduceFlagCell(state, payload);
+    case UNFLAG_CELL:
+      return reduceUnflagCell(state, payload);
     default:
       return state;
   }
