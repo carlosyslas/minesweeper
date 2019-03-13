@@ -1,7 +1,11 @@
 import React, { Component } from "react";
 import styled from "styled-components";
 import { connect } from "react-redux";
-import { selectBoard, selectCoveredCellsCount } from "./selectors";
+import {
+  selectBoard,
+  selectCoveredCellsCount,
+  selectBoardWidth
+} from "./selectors";
 import { createNewBoard, uncoverCell, flagCell, unflagCell } from "./actions";
 import { selectGameStatus } from "../status/selectors";
 import { HAS_MINE } from "./reducer";
@@ -10,15 +14,16 @@ import { GAME_STATUS } from "../status/constants";
 import theme from "../../theme";
 
 const Cell = styled.div`
-  width: ${theme.cellSize}px;
-  height: ${theme.cellSize}px;
+  box-sizing: border-box;
+  width: ${props => props.size}px;
+  height: ${props => props.size}px;
   background: ${props =>
     props.covered ? theme.primaryColor : theme.whiteColor};
   border: 2px solid ${theme.bodyBackground};
   border-radius: 4px;
   text-align: center;
-  font-size: ${theme.cellSize * 0.6}px;
-  line-height: ${theme.cellSize}px;
+  font-size: ${props => props.size * 0.6}px;
+  line-height: ${props => props.size}px;
   transition: 0.3s;
   box-shadow: 0px 0px 5px 3px rgba(0, 0, 0, 0.15) inset;
   cursor: pointer;
@@ -34,8 +39,8 @@ const Row = styled.div`
 `;
 
 const Mine = styled.div`
-  width: ${theme.cellSize / 2}px;
-  height: ${theme.cellSize / 2}px;
+  width: ${props => props.size / 2}px;
+  height: ${props => props.size / 2}px;
   border-radius: 50%;
   background: #ff7500;
   margin: 0 auto;
@@ -58,7 +63,7 @@ const MinesCount = styled.span`
   color: ${props => theme.minesCountColors[props.value - 1]};
 `;
 
-const CellContent = ({ value, covered, flagged }) => {
+const CellContent = ({ value, covered, flagged, size }) => {
   if (flagged) {
     return <Flag />;
   }
@@ -72,7 +77,7 @@ const CellContent = ({ value, covered, flagged }) => {
   }
 
   if (value < 0) {
-    return <Mine />;
+    return <Mine size={size} />;
   }
 
   return <MinesCount value={value}>{value}</MinesCount>;
@@ -120,13 +125,9 @@ class BoardScreen extends Component {
   };
 
   render() {
-    const {
-      board,
-      createNewBoard,
-      setGameStatus,
-      coveredCellsCount,
-      gameStatus
-    } = this.props;
+    const { board, gameStatus, windowWidth, boardWidth } = this.props;
+
+    const cellSize = Math.min(theme.cellSize, windowWidth / boardWidth);
 
     return (
       <Container enabled={gameStatus === GAME_STATUS.RUNNING}>
@@ -139,11 +140,13 @@ class BoardScreen extends Component {
                 onContextMenu={e =>
                   this.handleCellRightClick(e, { row: r, col })
                 }
+                size={cellSize}
               >
                 <CellContent
                   value={cell.value}
                   covered={cell.covered}
                   flagged={cell.flagged}
+                  size={cellSize}
                 />
               </Cell>
             ))}
@@ -153,10 +156,13 @@ class BoardScreen extends Component {
     );
   }
 }
+
 const mapStateToProps = state => ({
   board: selectBoard(state),
   gameStatus: selectGameStatus(state),
-  coveredCellsCount: selectCoveredCellsCount(state)
+  coveredCellsCount: selectCoveredCellsCount(state),
+  windowWidth: window.innerWidth,
+  boardWidth: selectBoardWidth(state)
 });
 
 const mapDispatchToProps = {

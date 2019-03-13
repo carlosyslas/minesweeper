@@ -1,7 +1,11 @@
 import React from "react";
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
+import { connect } from "react-redux";
 import theme from "./theme";
+import { setGameStatus } from "./game/status/actions";
+import { GAME_STATUS } from "./game/status/constants";
+import { selectGameStatus } from "./game/status/selectors";
 
 const Container = styled.div`
   padding: 15px;
@@ -20,18 +24,28 @@ const Container = styled.div`
       border-color: transparent;
       color: ${theme.bodyBackground};
     }
-    &.active {
-      display: none;
-    }
   }
 `;
 
-const NavBar = () => (
+const NavBar = ({ gameStatus, setGameStatus }) => (
   <Container>
-    <NavLink exact to="/" activeClassName="active">
-      <i className="fas fa-arrow-left" />
-    </NavLink>
+    {gameStatus !== GAME_STATUS.MENU && (
+      <NavLink exact to="/" onClick={() => setGameStatus(GAME_STATUS.MENU)}>
+        <i className="fas fa-arrow-left" />
+      </NavLink>
+    )}
   </Container>
 );
 
-export default NavBar;
+const mapStateToProps = state => ({
+  gameStatus: selectGameStatus(state)
+});
+
+const mapDispatchToProps = {
+  setGameStatus
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(NavBar);

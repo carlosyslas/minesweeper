@@ -8,7 +8,10 @@ import Home from "./home";
 import rootReducer from "./rootReducer";
 import NavBar from "./NavBar";
 
-const store = createStore(rootReducer);
+const store = createStore(
+  rootReducer,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+);
 
 class App extends Component {
   render() {
@@ -19,7 +22,7 @@ class App extends Component {
             <NavBar />
             <Switch>
               <Route exact path="/" component={Home} />
-              <Route path="/game" component={Game} />
+              <Route exact path="/game" component={Game} />
             </Switch>
           </div>
         </BrowserRouter>
