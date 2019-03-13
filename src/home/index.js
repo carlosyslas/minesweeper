@@ -31,6 +31,10 @@ const Button = styled.button`
   width: 100%;
   margin-top: 10px;
   cursor: pointer;
+
+  i {
+    margin-right: 15px;
+  }
 `;
 
 class Home extends Component {
@@ -57,6 +61,7 @@ class Home extends Component {
               this.createNewGame({ width: 9, height: 9, mines: 10 })
             }
           >
+            <i className="fas fa-poop" />
             Easy 9x9
           </Button>
           <Button
@@ -65,6 +70,7 @@ class Home extends Component {
               this.createNewGame({ width: 16, height: 16, mines: 26 })
             }
           >
+            <i className="fas fa-fire-alt" />
             Medium 16x16
           </Button>
           <Button
@@ -73,6 +79,7 @@ class Home extends Component {
               this.createNewGame({ width: 30, height: 16, mines: 50 })
             }
           >
+            <i className="fas fa-biohazard" />
             Expert 30x16
           </Button>
         </div>
