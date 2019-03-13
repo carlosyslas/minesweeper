@@ -130,15 +130,6 @@ class BoardScreen extends Component {
 
     return (
       <Container enabled={gameStatus === GAME_STATUS.RUNNING}>
-        COUNT:{coveredCellsCount}
-        <button
-          onClick={() => {
-            setGameStatus(GAME_STATUS.RUNNING);
-            createNewBoard({ width: 9, height: 9, mines: 1 });
-          }}
-        >
-          New
-        </button>
         {board.map((row, r) => (
           <Row>
             {row.map((cell, col) => (
