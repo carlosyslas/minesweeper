@@ -78,6 +78,10 @@ const CellContent = ({ value, covered, flagged }) => {
   return <MinesCount value={value}>{value}</MinesCount>;
 };
 
+const Container = styled.div`
+  filter: ${props => (props.enabled ? "" : "brightness(0.9) blur(1px)")};
+`;
+
 class BoardScreen extends Component {
   componentDidUpdate() {
     const { setGameStatus, coveredCellsCount } = this.props;
@@ -120,11 +124,12 @@ class BoardScreen extends Component {
       board,
       createNewBoard,
       setGameStatus,
-      coveredCellsCount
+      coveredCellsCount,
+      gameStatus
     } = this.props;
 
     return (
-      <div>
+      <Container enabled={gameStatus === GAME_STATUS.RUNNING}>
         COUNT:{coveredCellsCount}
         <button
           onClick={() => {
@@ -153,7 +158,7 @@ class BoardScreen extends Component {
             ))}
           </Row>
         ))}
-      </div>
+      </Container>
     );
   }
 }

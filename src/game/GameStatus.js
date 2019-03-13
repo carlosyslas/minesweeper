@@ -8,21 +8,36 @@ const Container = styled.div`
   top: 150px;
   left: 50%;
   transform: translate(-50%, -50%);
-  padding: 50px 150px;
   font-size: 30px;
-  color: ${theme.bodyBackground}
-  text-shadow: -2px -2px 0 #fff, 0px -2px 0 #fff, 2px -2px 0 #fff,
-    -2px 2px 0 #fff, 0px 2px #fff, 2px 2px 0 #fff, 0px 0px 60px #fff,
-    0px 0px 40px #fff, 0px 0px 20px #fff;
+  color: ${props => props.color};
+  text-shadow: -2px -2px 0 ${theme.whiteColor}, 0px -2px 0 ${theme.whiteColor},
+    2px -2px 0 ${theme.whiteColor}, -2px 2px 0 ${theme.whiteColor},
+    0px 2px ${theme.whiteColor}, 2px 2px 0 ${theme.whiteColor},
+    0px 0px 60px ${theme.whiteColor}, 0px 0px 40px ${theme.whiteColor},
+    0px 0px 20px ${theme.whiteColor};
+
+  @media (max-width: 400px) {
+    font-size: 25px;
+  }
 `;
 
-const GameStatus = ({ gameStatus }) =>
-  gameStatus !== GAME_STATUS.RUNNING &&
-  gameStatus !== GAME_STATUS.MENU && (
-    <Container>
-      {gameStatus === GAME_STATUS.LOST && <h2>Game Over</h2>}
-      {gameStatus === GAME_STATUS.WON && <h2>Congratulations!</h2>}
+const LOST_COLOR = "#c33300";
+const WON_COLOR = "#0067cb";
+
+const GameStatus = ({ gameStatus }) => {
+  if (gameStatus === GAME_STATUS.RUNNING || gameStatus === GAME_STATUS.MENU) {
+    return null;
+  }
+
+  const color = gameStatus === GAME_STATUS.LOST ? LOST_COLOR : WON_COLOR;
+  const text =
+    gameStatus === GAME_STATUS.LOST ? "Game Over" : "Congratulations!";
+
+  return (
+    <Container color={color}>
+      <h2>{text}</h2>
     </Container>
   );
+};
 
 export default GameStatus;
