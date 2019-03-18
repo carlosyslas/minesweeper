@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import styled from "styled-components";
 import { connect } from "react-redux";
 import { Redirect } from "react-router";
+import { FaPoop, FaFire, FaSkullCrossbones } from "react-icons/fa";
 import theme from "../theme";
 import { createNewBoard } from "../game/board/actions";
 import { setGameStatus } from "../game/status/actions";
@@ -32,7 +33,7 @@ const Button = styled.button`
   margin-top: 10px;
   cursor: pointer;
 
-  i {
+  svg {
     margin-right: 15px;
   }
 `;
@@ -61,7 +62,7 @@ class Home extends Component {
               this.createNewGame({ width: 9, height: 9, mines: 10 })
             }
           >
-            <i className="fas fa-poop" />
+            <FaPoop />
             Easy 9x9
           </Button>
           <Button
@@ -70,7 +71,7 @@ class Home extends Component {
               this.createNewGame({ width: 16, height: 16, mines: 26 })
             }
           >
-            <i className="fas fa-fire-alt" />
+            <FaFire />
             Medium 16x16
           </Button>
           <Button
@@ -79,7 +80,7 @@ class Home extends Component {
               this.createNewGame({ width: 30, height: 16, mines: 50 })
             }
           >
-            <i className="fas fa-biohazard" />
+            <FaSkullCrossbones />
             Expert 30x16
           </Button>
         </div>

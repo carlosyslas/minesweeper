@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
 import { connect } from "react-redux";
+import { FaArrowLeft } from "react-icons/fa";
 import theme from "./theme";
 import { setGameStatus } from "./game/status/actions";
 import { GAME_STATUS } from "./game/status/constants";
@@ -10,7 +11,7 @@ import { selectGameStatus } from "./game/status/selectors";
 const Container = styled.div`
   padding: 15px;
   a {
-    padding: 5px;
+    padding: 3px;
     width: 32px;
     height: 32px;
     box-sizing: border-box;
@@ -25,13 +26,17 @@ const Container = styled.div`
       color: ${theme.bodyBackground};
     }
   }
+  svg {
+    display: inline-block;
+    vertical-align: middle;
+  }
 `;
 
 const NavBar = ({ gameStatus, setGameStatus }) => (
   <Container>
     {gameStatus !== GAME_STATUS.MENU && (
       <NavLink exact to="/" onClick={() => setGameStatus(GAME_STATUS.MENU)}>
-        <i className="fas fa-arrow-left" />
+        <FaArrowLeft />
       </NavLink>
     )}
   </Container>
